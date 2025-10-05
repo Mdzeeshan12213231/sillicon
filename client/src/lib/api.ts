@@ -14,7 +14,7 @@ import {
 } from '../types';
 
 // API base URL - change this to your backend URL when deployed
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = 'https://sillicon-q2fr.vercel.app/api';
 
 // Create axios instance
 const api = axios.create({
