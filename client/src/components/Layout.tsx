@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useQuery } from 'react-query';
 import { notificationsAPI } from '../lib/api';
@@ -8,11 +8,9 @@ import {
   TicketIcon,
   PlusIcon,
   UsersIcon,
-  UserIcon,
   Bars3Icon,
   XMarkIcon,
   BellIcon,
-  Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
 import { motion, AnimatePresence } from 'framer-motion';
 import Notifications from './Notifications';
@@ -22,19 +20,19 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
-  const { data: unreadCount } = useQuery(
+  const { data: unreadCountData } = useQuery(
     'unread-count',
     notificationsAPI.getUnreadCount,
     {
       refetchInterval: 30000, // Refetch every 30 seconds
     }
   );
+  const unreadCount = typeof unreadCountData === 'object' && unreadCountData !== null ? unreadCountData.count : unreadCountData;
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, current: location.pathname === '/dashboard' },
@@ -46,10 +44,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     navigation.push({ name: 'Users', href: '/users', icon: UsersIcon, current: location.pathname === '/users' });
   }
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -191,9 +185,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 className="relative rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
               >
                 <BellIcon className="h-6 w-6" />
-                {unreadCount && unreadCount > 0 && (
+                {typeof unreadCount === 'number' && unreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
-                    {unreadCount > 9 ? '9+' : unreadCount}
+                    {typeof unreadCount === 'number' ? (unreadCount > 9 ? '9+' : unreadCount) : null}
                   </span>
                 )}
               </button>

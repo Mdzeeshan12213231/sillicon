@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { notificationsAPI } from '../lib/api';
 import { BellIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
@@ -31,7 +31,7 @@ const Notifications: React.FC<NotificationsProps> = ({ isOpen, onClose }) => {
   const { data: notificationsData, isLoading } = useQuery(
     ['notifications', activeTab],
     () => notificationsAPI.getNotifications({ 
-      unreadOnly: activeTab === 'unread',
+  // unreadOnly removed, not in FilterOptions
       limit: 20 
     }),
     {
@@ -39,13 +39,14 @@ const Notifications: React.FC<NotificationsProps> = ({ isOpen, onClose }) => {
     }
   );
 
-  const { data: unreadCount } = useQuery(
+  const { data: unreadCountData } = useQuery(
     'unread-count',
     notificationsAPI.getUnreadCount,
     {
       refetchInterval: 30000,
     }
   );
+  const unreadCount = typeof unreadCountData === 'object' && unreadCountData !== null ? unreadCountData.count : unreadCountData;
 
   const markAsReadMutation = useMutation(notificationsAPI.markAsRead, {
     onSuccess: () => {
@@ -120,9 +121,9 @@ const Notifications: React.FC<NotificationsProps> = ({ isOpen, onClose }) => {
           <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
             <div className="flex items-center space-x-2">
               <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
-              {unreadCount && unreadCount > 0 && (
+              {typeof unreadCount === 'number' && unreadCount > 0 && (
                 <span className="inline-flex items-center rounded-full bg-red-500 px-2 py-1 text-xs font-medium text-white">
-                  {unreadCount}
+                  {typeof unreadCount === 'number' ? unreadCount : null}
                 </span>
               )}
             </div>
@@ -177,58 +178,52 @@ const Notifications: React.FC<NotificationsProps> = ({ isOpen, onClose }) => {
               <div className="flex items-center justify-center py-8">
                 <LoadingSpinner />
               </div>
-            ) : notificationsData?.notifications?.length > 0 ? (
-              <div className="divide-y divide-gray-200">
-                {notificationsData.notifications.map((notification: Notification) => (
-                  <div
-                    key={notification._id}
-                    className={`p-4 hover:bg-gray-50 ${
-                      !notification.isRead ? 'bg-blue-50' : ''
-                    }`}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0">
-                        <div className={`flex h-8 w-8 items-center justify-center rounded-full ${getNotificationColor(notification.type)}`}>
-                          <span className="text-sm">{getNotificationIcon(notification.type)}</span>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <p className={`text-sm font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'}`}>
-                            {notification.title}
-                          </p>
-                          {!notification.isRead && (
-                            <button
-                              onClick={() => handleMarkAsRead(notification._id)}
-                              className="ml-2 text-gray-400 hover:text-gray-600"
-                            >
-                              <CheckIcon className="h-4 w-4" />
-                            </button>
-                          )}
-                        </div>
-                        <p className="mt-1 text-sm text-gray-600">{notification.message}</p>
-                        {notification.ticket && (
-                          <p className="mt-1 text-xs text-gray-500">
-                            Ticket: {notification.ticket.title}
-                          </p>
-                        )}
-                        <p className="mt-1 text-xs text-gray-400">
-                          {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <BellIcon className="h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No notifications</h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  {activeTab === 'unread' 
-                    ? "You're all caught up!" 
-                    : "You don't have any notifications yet."}
-                </p>
+              <div className="px-6 py-4">
+                {notificationsData && notificationsData.notifications && notificationsData.notifications.length > 0 ? (
+                  <div className="divide-y divide-gray-200">
+                    {notificationsData.notifications.map((notification: Notification) => (
+                      <div
+                        key={notification._id}
+                        className={`p-4 hover:bg-gray-50 ${!notification.isRead ? 'bg-blue-50' : ''}`}
+                      >
+                        <div className="flex items-start space-x-3">
+                          <div className="flex-shrink-0">
+                            <div className={`flex h-8 w-8 items-center justify-center rounded-full ${getNotificationColor(notification.type)}`}>
+                              <span className="text-sm">{getNotificationIcon(notification.type)}</span>
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <p className={`text-sm font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'}`}>{notification.title}</p>
+                              {!notification.isRead && (
+                                <button
+                                  onClick={() => handleMarkAsRead(notification._id)}
+                                  className="ml-2 text-gray-400 hover:text-gray-600"
+                                >
+                                  <CheckIcon className="h-4 w-4" />
+                                </button>
+                              )}
+                            </div>
+                            <p className="mt-1 text-sm text-gray-600">{notification.message}</p>
+                            {notification.ticket && (
+                              <p className="mt-1 text-xs text-gray-500">Ticket: {notification.ticket.title}</p>
+                            )}
+                            <p className="mt-1 text-xs text-gray-400">{formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <BellIcon className="h-12 w-12 text-gray-400" />
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">No notifications</h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {activeTab === 'unread' ? "You're all caught up!" : "You don't have any notifications yet."}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>

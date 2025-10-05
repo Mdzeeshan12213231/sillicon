@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { ticketsAPI, commentsAPI, usersAPI } from '../lib/api';
 import KnowledgeBaseSuggestions from '../components/KnowledgeBaseSuggestions';
@@ -12,12 +12,7 @@ import Select from '../components/Select';
 import {
   ArrowLeftIcon,
   PencilIcon,
-  UserIcon,
-  ClockIcon,
   TagIcon,
-  ChatBubbleLeftRightIcon,
-  PaperClipIcon,
-  CheckCircleIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import { formatDistanceToNow, format } from 'date-fns';
@@ -25,7 +20,7 @@ import toast from 'react-hot-toast';
 
 const TicketDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  // Removed unused navigate
   const queryClient = useQueryClient();
   const { user } = useAuth();
   
@@ -305,7 +300,6 @@ const TicketDetail: React.FC = () => {
                     key={comment._id}
                     comment={comment}
                     showInternal={showInternalComments}
-                    userRole={user?.role}
                   />
                 ))}
               </div>
@@ -514,8 +508,7 @@ const TicketEditForm: React.FC<{
 const CommentItem: React.FC<{
   comment: any;
   showInternal: boolean;
-  userRole?: string;
-}> = ({ comment, showInternal, userRole }) => {
+}> = ({ comment, showInternal }) => {
   if (comment.isInternal && !showInternal) {
     return null;
   }

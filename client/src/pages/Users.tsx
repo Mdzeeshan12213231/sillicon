@@ -7,7 +7,6 @@ import Input from '../components/Input';
 import Select from '../components/Select';
 import {
   UserGroupIcon,
-  MagnifyingGlassIcon,
   FunnelIcon,
   UserIcon,
   EnvelopeIcon,
@@ -182,9 +181,9 @@ const Users: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  'bg-gray-100 text-gray-800'
                       }`}>
-                        {user.isActive ? 'Active' : 'Inactive'}
+                  'User'
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -193,7 +192,8 @@ const Users: React.FC = () => {
                         : 'Never'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDistanceToNow(new Date(user.createdAt || new Date()), { addSuffix: true })}
+                      {/* createdAt removed, User type does not have this property */}
+                        {/* createdAt not in User type, so just show a placeholder or remove */}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">

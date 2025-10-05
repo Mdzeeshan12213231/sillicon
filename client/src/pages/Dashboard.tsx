@@ -77,7 +77,15 @@ const Dashboard: React.FC = () => {
   }
 
   const analytics = analyticsData?.analytics;
-  const tickets = allTickets?.tickets || [];
+  const tickets = (allTickets?.tickets || []).map(ticket => ({
+    ...ticket,
+    assignedTo: ticket.assignedTo && ticket.assignedTo.id && ticket.assignedTo.name
+      ? { _id: String(ticket.assignedTo.id), name: String(ticket.assignedTo.name) }
+      : undefined,
+    createdBy: ticket.createdBy && ticket.createdBy.id && ticket.createdBy.name
+      ? { _id: String(ticket.createdBy.id), name: String(ticket.createdBy.name) }
+      : { _id: '', name: '' }, // fallback to empty strings if missing
+  }));
 
   type StatCardProps = {
     title: string;

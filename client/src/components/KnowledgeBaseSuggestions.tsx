@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { ticketsAPI } from '../lib/api';
-import { BookOpenIcon, ArrowTopRightOnSquareIcon as ExternalLinkIcon, HandThumbUpIcon as ThumbUpIcon, HandThumbDownIcon as ThumbDownIcon, EyeIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, ArrowTopRightOnSquareIcon as ExternalLinkIcon, HandThumbUpIcon as ThumbUpIcon, EyeIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from './LoadingSpinner';
 
 interface Suggestion {

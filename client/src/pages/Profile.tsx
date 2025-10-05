@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Select from '../components/Select';
-import { UserIcon, EnvelopeIcon, ShieldCheckIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { UserIcon, EnvelopeIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 interface ProfileFormData {
@@ -30,7 +30,6 @@ interface PasswordFormData {
 const Profile: React.FC = () => {
   const { user, logout } = useAuth();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
 
   const {
@@ -71,26 +70,18 @@ const Profile: React.FC = () => {
     },
   });
 
-  const changePasswordMutation = useMutation(authAPI.changePassword, {
-    onSuccess: () => {
-      toast.success('Password changed successfully');
-      resetPassword();
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to change password');
-    },
-  });
-
-  const onProfileSubmit = (data: ProfileFormData) => {
-    updateProfileMutation.mutate(data);
-  };
-
-  const onPasswordSubmit = (data: PasswordFormData) => {
-    changePasswordMutation.mutate({
-      currentPassword: data.currentPassword,
-      newPassword: data.newPassword,
-    });
-  };
+  const changePasswordMutation = useMutation(
+    ({ currentPassword, newPassword }: { currentPassword: string; newPassword: string }) => authAPI.changePassword(currentPassword, newPassword),
+    {
+      onSuccess: () => {
+        toast.success('Password changed successfully');
+        resetPassword();
+      },
+      onError: (error: any) => {
+        toast.error(error.response?.data?.message || 'Failed to change password');
+      },
+    }
+  );
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -142,6 +133,27 @@ const Profile: React.FC = () => {
       default:
         return <UserIcon className="h-4 w-4" />;
     }
+  };
+
+  const onProfileSubmit = (data: ProfileFormData) => {
+    // Ensure theme is of correct type
+    const validTheme = ['light', 'dark', 'auto'].includes(data.preferences.theme)
+      ? (data.preferences.theme as 'light' | 'dark' | 'auto')
+      : 'auto';
+    updateProfileMutation.mutate({
+      ...data,
+      preferences: {
+        ...data.preferences,
+        theme: validTheme,
+      },
+    });
+  };
+
+  const onPasswordSubmit = (data: PasswordFormData) => {
+    changePasswordMutation.mutate({
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+    });
   };
 
   if (!user) {
@@ -210,7 +222,7 @@ const Profile: React.FC = () => {
               </div>
             </div>
             <div className="px-6 py-4">
-              <form onSubmit={handleProfileSubmit} className="space-y-6">
+              <form onSubmit={handleProfileSubmit(onProfileSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <Input
                     {...registerProfile('name', {
@@ -304,7 +316,7 @@ const Profile: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-900">Change Password</h3>
             </div>
             <div className="px-6 py-4">
-              <form onSubmit={handlePasswordSubmit} className="space-y-4">
+              <form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className="space-y-4">
                 <Input
                   {...registerPassword('currentPassword', {
                     required: 'Current password is required',

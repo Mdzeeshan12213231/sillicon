@@ -3,7 +3,6 @@ import { useMutation } from 'react-query';
 import { chatAPI } from '../lib/api';
 import {
   PaperAirplaneIcon,
-  ChatBubbleLeftRightIcon,
   XMarkIcon,
   SparklesIcon,
   UserIcon

@@ -9,7 +9,6 @@ import Input from '../components/Input';
 import Select from '../components/Select';
 import {
   TicketIcon,
-  MagnifyingGlassIcon,
   FunnelIcon,
   PlusIcon,
   EyeIcon,
@@ -32,7 +31,7 @@ const Tickets: React.FC = () => {
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  const { data: ticketsData, isLoading, refetch } = useQuery(
+  const { data: ticketsData, isLoading } = useQuery(
     ['tickets', filters],
     () => ticketsAPI.getTickets(filters),
     {

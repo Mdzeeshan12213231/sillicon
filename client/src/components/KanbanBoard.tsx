@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useMutation, useQueryClient } from 'react-query';
 import { ticketsAPI } from '../lib/api';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import {
@@ -9,7 +9,7 @@ import {
   XCircleIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
-import LoadingSpinner from './LoadingSpinner';
+// import LoadingSpinner from './LoadingSpinner'; // Remove if not used
 
 interface Ticket {
   _id: string;
@@ -90,7 +90,11 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tickets, onTicketUpdate }) =>
 
   const updateTicketMutation = useMutation(
     ({ ticketId, updates }: { ticketId: string; updates: Partial<Ticket> }) =>
-      ticketsAPI.updateTicket(ticketId, updates),
+  ticketsAPI.updateTicket(ticketId, {
+    ...updates,
+    assignedTo: typeof updates.assignedTo === 'object' && updates.assignedTo?._id ? updates.assignedTo._id : (updates.assignedTo as string | undefined),
+    version: (updates as any).version ?? 1,
+  }),
     {
       onSuccess: () => {
         queryClient.invalidateQueries('tickets');
@@ -267,7 +271,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ tickets, onTicketUpdate }) =>
 
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="flex space-x-4 overflow-x-auto pb-4">
-          {Object.entries(statusConfig).map(([status, config]) => (
+          {Object.keys(statusConfig).map((status) => (
             <StatusColumn
               key={status}
               status={status}

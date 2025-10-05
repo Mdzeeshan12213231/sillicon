@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 import { ticketsAPI } from '../lib/api';
 import Button from '../components/Button';
 import Input from '../components/Input';
