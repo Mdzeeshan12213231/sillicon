@@ -130,12 +130,19 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/chat', chatRoutes);
 
 // Health check endpoint
+
+// Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
+});
+
+// Root endpoint for Render and general health check
+app.get('/', (req, res) => {
+  res.send('API is running');
 });
 
 // Error handling middleware
