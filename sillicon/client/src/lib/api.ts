@@ -13,8 +13,11 @@ import {
   FilterOptions
 } from '../types';
 
-// API base URL: uses Vite env override if provided, otherwise proxy to local backend
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api';
+// API base URL - uses Vite proxy in development, real backend in production
+const API_BASE_URL =
+  import.meta.env.MODE === 'production'
+    ? 'https://sillicon-q2fr-git-main-mdzeeshan12213231s-projects.vercel.app/api'
+    : '/api';
 
 // Create axios instance
 const api = axios.create({

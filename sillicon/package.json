@@ -14,14 +14,7 @@
   "devDependencies": {
     "concurrently": "^8.2.2"
   },
-  "keywords": [
-    "helpdesk",
-    "ticketing",
-    "sla",
-    "react",
-    "nodejs",
-    "mongodb"
-  ],
+  "keywords": ["helpdesk", "ticketing", "sla", "react", "nodejs", "mongodb"],
   "author": "HelpDesk Mini Team",
   "license": "MIT"
 }
