@@ -10,9 +10,12 @@ services:
       - key: MONGODB_URI
         value: mongodb+srv://zk00465_db_user:bxridmjTB4li1rtv@cluster0.hgplvh3.mongodb.net/helpdesk_mini?retryWrites=true&w=majority
 
-  - type: web
+  - type: static
     name: sillicon-helpdesk-client
-    env: node
+    env: static
     buildCommand: cd client && npm install && npm run build
-    startCommand: cd client && npm run preview
     publishDir: client/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
