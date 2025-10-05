@@ -62,10 +62,17 @@ app.use(express.urlencoded({ extended: true }));
 
 // MongoDB connection
 const dbUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/helpdesk_mini';
-const uriParts = dbUri.split('/');
-const hasDbSegment = uriParts.length > 3 && uriParts[3] && !uriParts[3].includes('?');
-if (!hasDbSegment) {
-  console.warn('Warning: MongoDB URI does not specify a database name.');
+try {
+  const parsedForDb = new URL(
+    dbUri.replace('mongodb+srv://', 'http://').replace('mongodb://', 'http://')
+  );
+  const dbName = parsedForDb.pathname.replace('/', '').split('?')[0];
+  if (!dbName) {
+    console.warn('Warning: MongoDB URI does not specify a database name.');
+  }
+} catch (e) {
+  // If parsing fails, keep going but log a warning
+  console.warn('Warning: Unable to parse MongoDB URI to verify database name.');
 }
 console.log('Connecting to MongoDB...');
 let connectionTimeout;
